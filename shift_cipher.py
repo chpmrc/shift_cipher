@@ -12,11 +12,12 @@ def break_ciphertext(ciphertext, dictionary):
 
 	for k in xrange(0, 26):
 		# Shift with the key
-		for i in xrange(0, len(ciphertext)):	
+		for i in xrange(0, len(ciphertext)):
+			# Let's remember to map from alphabet indices to ASCII code!
 			cur_word += chr((((ord(ciphertext[i]) - 97) + k) % 26) + 97)
 		try:
 			dictionary.index(cur_word + "\n")
-			plaintexts.append(cur_word)
+			plaintexts.append((cur_word, str(k)))
 		except Exception:
 			pass
 		cur_word = ""
