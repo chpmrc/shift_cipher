@@ -13,6 +13,7 @@ def find_spurious_keys(n, dictionary, output_file):
 	cache_available = False
 	min_length = 5
 	shifts = {}
+	spurious = []
 	try:
 		shifts = ast.literal_eval("".join(open(cache_file, "r").readlines()).lower())
 		cache_available = True
@@ -20,7 +21,7 @@ def find_spurious_keys(n, dictionary, output_file):
 		print "Cache not available (%s), rebuilding index of shifts" % e
 		cache = open(cache_file, "w")
 	if not cache_available:
-		for w in dictionary:
+		for w in dictionary: # ['riverriver', 'arenaarena']: # DEBUG
 			if len(w) >= min_length:
 				try: # if exists
 					shifts[w]
@@ -29,16 +30,20 @@ def find_spurious_keys(n, dictionary, output_file):
 				for k in xrange(0, 26):
 					shifts[w].append(shift(w, k))
 		cache.write(str(shifts))
-	else:
-		print len(shifts)
-		for plain1, shifts1 in shifts.iteritems():
-			for index1, scrambled1 in enumerate(shifts1):
-				for plain2, shifts2 in shifts.iteritems():
-					if len(plain1) != len(plain2) or plain1 == plain2:
-						continue
-					for index2, scrambled2 in enumerate(shifts2):
-						if (scrambled1 == scrambled2):
-							print "Spurious key found! " + str((plain1, index1, scrambled1, plain2, index2, scrambled2))
+	print "Words found: " + str(len(shifts))
+	for plain1, shifts1 in shifts.iteritems():
+		if plain1 in spurious:
+			continue
+		print "Testing " + plain1
+		for index1, scrambled1 in enumerate(shifts1):
+			for plain2, shifts2 in shifts.iteritems():
+				if len(plain1) != len(plain2) or plain1 == plain2 or plain2 in spurious:
+					continue
+				for index2, scrambled2 in enumerate(shifts2):
+					if (scrambled1 == scrambled2):
+						print "Spurious key found! " + str((plain1, index1, scrambled1, plain2, index2, scrambled2))
+						spurious.append(plain1)
+						spurious.append(plain2)
 
 
 
